@@ -183,7 +183,16 @@
     }
   }
 
-  // 通过cookie和localStorage获取GID(32位，时间+随机数字)，如果不存在则创建
+  // 创建GID
+  function createGID() {
+    // 在cookie或localStorage中都不存在GID，则创建GID并保存
+    var timeStamp = Date.parse(new Date()); // 13位时间戳
+    GID = timeStamp + '' + generateMixed(19); // 加19位随机数
+    localStorage.setItem('_MD_GID', GID);
+    setCookie('GID', GID, 30, 1);
+  }
+
+  // 通过本地的cookie和localStorage获取GID(32位，时间+随机数字)，如果不存在则创建
   function setGID() {
     var GID = '';
     var GID_cookie = getCookie('GID');
@@ -197,16 +206,28 @@
       createGID();
     }
   }
-  setGID();
 
-  // 创建GID
-  function createGID() {
-    // 在cookie或localStorage中都不存在GID，则创建GID并保存
-    var timeStamp = Date.parse(new Date()); // 13位时间戳
-    GID = timeStamp + '' + generateMixed(19);
-    localStorage.setItem('_MD_GID', GID);
-    setCookie('GID', GID, 30, 1);
+  // 获取服务器的GID，并保存到cookie和localStorage中
+  function getGID() {
+    $.ajax({
+      url: 'https://linkcrm.verge-tech.cn/?c=record&m=get_gid',
+      dataType: 'jsonp',
+      jsonp: 'jsonpcallback',
+      success: function (res) {
+        console.log(res)
+        if (res.code == 200) {
+          var GID = res.info.GID;
+          localStorage.setItem('_MD_GID', GID);
+          setCookie('GID', GID, 30, 1);
+        }
+        setGID();
+      },
+      error: function () {
+        console.log('error')
+      }
+    })
   }
+  getGID();
 
   // 获取用户来源URL
   function getReferrer() {
@@ -268,7 +289,7 @@
     if (document.getElementById(id) != null) {
       document.getElementById(id).addEventListener('blur', function () {
         var input_value = this.value;
-        var inputContent = localStorage.getItem('_MD_inputContent') || '';
+        var inputContent = localStorage.getItem('_MD_inputContent');
         var inputContentArr = [];
         if (inputContent != null && inputContent != '') {
           inputContentArr = inputContent.split(',');
@@ -352,6 +373,16 @@
       // 获取用户访问时长
       options.stayTime = dateToTimestamp(options.getoutTime) - dateToTimestamp(options.accessTime);
     }
+    if (options.nextUrl == null) {
+      options.nextUrl = '';
+    }
+    if (options.firstClickItem == null) {
+      options.firstClickItem = '';
+    }
+    if (options.inputContent == null) {
+      options.inputContent = '';
+    }
+
     localStorage.setItem('_MD_options', JSON.stringify(options));
   }
 
