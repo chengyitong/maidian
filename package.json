@@ -1,5 +1,5 @@
 {
-  "name": "tantu-web",
+  "name": "maidian",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "author": "chengyitong",
   "license": "MIT",
   "description": "",
-  "homepage": "http://www.tantupix.com/",
+  "homepage": "",
   "devDependencies": {
     "autoprefixer": "^6.7.7",
     "browser-sync": "^2.18.8",

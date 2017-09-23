@@ -1,73 +1,46 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="google" value="notranslate" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta content="email=no" name="format-detection" />
-    <meta name="keywords" content="" />
-    <meta name="description" content="" />
-    <meta name="Author" content="" />
-    <title>埋点</title>
-    <link rel="icon" href="static/img/logo.gif" />
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" /> -->
-    <link rel="stylesheet" href="static/css/common/normalize.min.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" /> -->
-    <link rel="stylesheet" href="static/css/common/bootstrap-3.3.5.min.css">
-    <link rel="stylesheet" href="static/css/style.css" />
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="google" value="notranslate" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta content="email=no" name="format-detection" />
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <meta name="Author" content="" />
+  <title>埋点</title>
+  <link rel="icon" href="static/img/logo.gif" />
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" /> -->
+  <link rel="stylesheet" href="static/css/common/normalize.min.css">
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" /> -->
+  <link rel="stylesheet" href="static/css/common/bootstrap-3.3.5.min.css">
+  <link rel="stylesheet" href="static/css/style.css" />
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
        <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
        <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
+</head>
 
-  <body>
-    <!--[if lt IE 8]>
+<body>
+  <!--[if lt IE 8]>
       <p style="margin: 0;padding: .5em 1em;background-color: #fcfcfc;text-align: center;">您使用的浏览器<strong>已过时</strong>。 请 <a href="http://browsehappy.com/">升级您的浏览器</a> 以提高您的使用体验。</p>
     <![endif]-->
 
-    <form action="" class="form-inline">
-      <input class="form-control" type="text" id="keyword">
-      <button type="button" class="btn btn-primary btn-sm" onclick="sendData2()">发送</button>
-    </form>
+  <form action="" class="form-inline">
+    <input class="form-control" type="text" id="keyword">
+    <button type="button">hah</button>
+  </form>
 
-    <a href="index2.html">index2.html</a>
+  <a href="index2.html">查看统计数据</a>
 
-    <!-- Scripts -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script> -->
-    <script src="static/js/libs/jquery-1.12.1.min.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script> -->
-    <script src="static/js/libs/bootstrap-3.3.5.min.js"></script>
-    <script src="static/js/analysis.js"></script>
-    <script>
-      function sendData2() {
-        $.post('https://linkcrm.verge-tech.cn/?c=record&m=add_record', {
-          GID: getCookie('GID'), // 用户唯一ID（32位：时间+随机数字）
-          uid: getCookie('GID'), // 用户id，暂时跟GID一样,用户不登录时等同于GID，商户不允许获取的情况下也等于GID
-          functionID: 'ceshi', // 探头ID号
-          clientID: 'ceshi2', // 商户ID号
-          webUrl: window.location.href, // 网站页面路径
-          refUrl: getReferrer(), // 用户来源URL（HTTP_REFERER）
-          nextUrl: 'http://localhost:8081/', // 页面访问路径 定义为用户将要跳转到的页面
-          userIP: getCookie('IP') || localStorage.getItem('IP'), // 用户ip
-          userUA: navigator.userAgent, // 用户UA-User-Agent
-          firstClickItem: 'http://localhost:8081/', // 用户第一个点击行为 即 用户点击的第一个超链接或者按钮 的文本信息
-          inputContent: localStorage.getItem('keywords'), // 用户在搜索框输入的所有关键字
-          accessTime: dateForm(), // 用户访问时间,为具体的年月日时分秒
-          getoutTime: dateForm(Date.parse(new Date()) + (second * 1000)), // 用户跳出时间,为具体的年月日时分秒
-          stayTime: second, // 用户访问时长,单位为秒
-          screen: window.screen.width + '*' + window.screen.height // 显示器分辨率1920*986
-        }, function (res) {
-          console.log(res)
-        })
-      }
-    </script>
-  </body>
+  <!-- Scripts -->
+  <script src="static/js/analysis.js"></script>
+</body>
 
 </html>
