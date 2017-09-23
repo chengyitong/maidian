@@ -302,7 +302,6 @@
           localStorage.removeItem('_MD_nextUrl');
           localStorage.removeItem('_MD_options');
         }
-        console.log(res)
       },
       error: function () {
         console.log('error')
@@ -368,10 +367,8 @@
     if (navigation_type != 1) {
       var _options = eval('(' + localStorage.getItem('_MD_options') + ')');
       sendData(_options);
-      console.log(_options);
     } else {
       getOptions();
     }
   }
 })();
-
