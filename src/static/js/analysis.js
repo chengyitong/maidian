@@ -76,12 +76,12 @@
         }
       }
     }
-    document.cookie = "_MD_" + name + "=" + escape(value) + (times ? ";expires=" + exp.toGMTString() : "") + ";path=/"
+    document.cookie = '_MD_' + name + '=' + escape(value) + (times ? ';expires=' + exp.toGMTString() : '') + ';path=/'
   }
 
   // 获取cookie
   function getCookie(name) {
-    var arr, reg = new RegExp("(^| )" + "_MD_" + name + "=([^;]*)(;|$)");
+    var arr, reg = new RegExp('(^| )' + '_MD_' + name + '=([^;]*)(;|$)');
     if (arr = document.cookie.match(reg)) {
       return unescape(arr[2])
     } else {
@@ -95,7 +95,7 @@
     exp.setTime(exp.getTime() - 1);
     var cval = getCookie(name);
     if (cval != null) {
-      document.cookie = "_MD_" + name + "=" + cval + ";expires=" + exp.toGMTString() + ";path=/"
+      document.cookie = '_MD_' + name + '=' + cval + ';expires=' + exp.toGMTString() + ';path=/'
     }
   }
 
@@ -264,6 +264,7 @@
       url: 'https://linkcrm.verge-tech.cn/?c=record&m=get_gid',
       jsonp: 'jsonpcallback',
       success: function (res) {
+        var res = JSON.parse(res);
         if (res.code == 200) {
           var GID = res.info.GID;
           localStorage.setItem('_MD_GID', GID);
@@ -276,7 +277,8 @@
       }
     })
   }
-  getGID();
+  // getGID();
+  setGID();
 
   // 获取用户来源URL
   function getReferrer() {
@@ -303,16 +305,14 @@
   // 获取IP
   function getIP() {
     createScript('http://pv.sohu.com/cityjson?ie=utf-8', function () {
-      var IP = returnCitySN["cip"];
+      var IP = returnCitySN['cip'];
       localStorage.setItem('_MD_IP', IP);
-      return IP;
-      // console.log('IP地址:' + returnCitySN["cip"] + ', CID:' + returnCitySN["cid"] + ', 地区:' + returnCitySN["cname"]);
     })
   }
   getIP();
 
   // 获取用户点击的第一个超链接或者按钮的文本信息；如果点击的是超链接可以同时获取nextUrl
-  function firstClickItem() {
+  function getFirstClickItem() {
     document.addEventListener('mousedown', function (e) {
       var firstClickItem = localStorage.getItem('_MD_firstClickItem');
       if (firstClickItem != null && firstClickItem != '') {
@@ -331,7 +331,7 @@
     });
   }
   // 调用记录第一个点击行为方法
-  firstClickItem();
+  getFirstClickItem();
 
   // 获取搜索框关键词,id为需要监测的搜索框id
   function getKeyWords(id) {
@@ -361,6 +361,7 @@
       dataType: 'json',
       data: data,
       success: function (res) {
+        var res = JSON.parse(res);
         // 如果发送成功，则清空上一次的统计数据
         if (res.code == 200) {
           // 清空需要重新获取的值
@@ -370,8 +371,8 @@
           localStorage.removeItem('_MD_options');
         }
       },
-      error: function () {
-        console.log('error')
+      error: function (error) {
+        console.log(error);
       }
     })
   }
