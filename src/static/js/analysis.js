@@ -6,6 +6,7 @@
 * 4、functionID和clientID根据实际情况填写，默认为1.0
 */
 (function () {
+  var base_url = 'https://linkcrm.verge-tech.cn/'; // 服务器接口域名
   var options = '';
   // 初始化
   function init() {
@@ -279,7 +280,7 @@
   // 获取服务器的GID，并保存到cookie和localStorage中
   function getGID() {
     ajax({
-      url: 'https://linkcrm.verge-tech.cn/?c=record&m=get_gid',
+      url: base_url + '?c=record&m=get_gid',
       dataType: 'jsonp',
       jsonp: "jsonpcallback",
       success: function (res) {
@@ -300,7 +301,7 @@
   // 保存GID到服务器
   function saveGID(GID) {
     ajax({
-      url: 'https://linkcrm.verge-tech.cn/?c=record&m=save_gid',
+      url: base_url + '?c=record&m=save_gid',
       jsonp: 'jsonpcallback',
       data: { 'GID': GID },
       success: function (res) {
@@ -363,8 +364,7 @@
       }
       // 获取输入框的值
       if (_target.localName.toLowerCase() == 'input' || _target.localName.toLowerCase() == 'textarea') {
-        var id = _target.id;
-        document.getElementById(id).addEventListener('blur', function (event) {
+        _target.addEventListener('blur', function (event) {
           var inputContent = event.target.value;
           var _inputContent = localStorage.getItem('_MD_inputContent');
           var _inputContent_arr = [];
@@ -387,7 +387,7 @@
   function sendData(data) {
     ajax({
       type: 'POST',
-      url: 'https://linkcrm.verge-tech.cn/?c=record&m=add_record',
+      url: base_url + '?c=record&m=add_record',
       dataType: 'json',
       data: data,
       success: function (res) {
