@@ -3,8 +3,7 @@
 * 1、需要在所有需要统计的页面中引入该脚本文件；
 * 2、在其他js文件之前引入；
 * 3、该脚本不依赖其他的js库，可独立运行；
-* 4、需要根据搜索框的id修改getKeyWords(id)的参数
-* 5、根据实际需要修改functionID和clientID的值
+* 4、functionID和clientID根据实际情况填写，默认为1.0
 */
 (function () {
   var options = '';
@@ -14,8 +13,8 @@
     options = {
       GID: '', // 用户唯一ID（32位：时间+随机数字）
       uid: '', // 用户id，暂时跟GID一样,用户不登录时等同于GID，商户不允许获取的情况下也等于GID
-      functionID: 'ceshi', // 探头ID号
-      clientID: 'ceshi2', // 商户ID号
+      functionID: '1.0', // 探头ID号
+      clientID: '1.0', // 商户ID号
       webUrl: window.location.href, // 网站页面路径
       refUrl: '', // 用户来源URL（HTTP_REFERER）
       nextUrl: '', // 页面访问路径 定义为用户将要跳转到的页面
@@ -134,6 +133,15 @@
     return res;
   }
 
+  // 数组去重
+  function unique(array) {
+    var n = [];// 临时数组
+    for (var i = 0; i < array.length; i++) {
+      if (n.indexOf(array[i]) === -1) n.push(array[i]);
+    }
+    return n;
+  }
+
   // 定义原生ajax方法
   function ajax(params) {
     params = params || {};
@@ -175,7 +183,11 @@
 
       // 连接和传输数据
       if (params.type == 'GET') {
-        xhr.open(params.type, params.url + '?' + params.data, true);
+        var str_and = '?';
+        if (params.url.indexOf('?') > 0) {
+          str_and = '&';
+        }
+        xhr.open(params.type, params.url + str_and + params.data, true);
         xhr.send(null);
       } else {
         xhr.open(params.type, params.url, true);
@@ -191,7 +203,7 @@
       var callbackName = params.jsonp;
       var head = document.getElementsByTagName('head')[0];
       // 设置传递给后台的回调参数名
-      params.data['callback'] = callbackName;
+      params.data['jsonpcallback'] = callbackName;
       var data = formatParams(params.data);
       var script = document.createElement('script');
       head.appendChild(script);
@@ -205,7 +217,11 @@
       };
 
       //发送请求
-      script.src = params.url + '?' + data;
+      var str_and = '?';
+      if (params.url.indexOf('?') > 0) {
+        str_and = '&';
+      }
+      script.src = params.url + str_and + data;
 
       //超时处理
       if (params.time) {
@@ -241,18 +257,20 @@
     GID = timeStamp + '' + generateMixed(19); // 加19位随机数
     localStorage.setItem('_MD_GID', GID);
     setCookie('GID', GID, 30, 1);
+    saveGID(GID);
   }
 
   // 通过本地的cookie和localStorage获取GID(32位，时间+随机数字)，如果不存在则创建
   function setGID() {
-    var GID = '';
     var GID_cookie = getCookie('GID');
     var GID_localStorage = localStorage.getItem('_MD_GID');
     // 在cookie或localStorage中存在GID
     if (GID_cookie != null && GID_localStorage == null) {
       localStorage.setItem('_MD_GID', GID_cookie);
+      saveGID(GID_cookie);
     } else if (GID_cookie == null && GID_localStorage != null) {
       setCookie('GID', GID_localStorage, 30, 1);
+      saveGID(GID_localStorage);
     } else if (GID_cookie == null && GID_localStorage == null) {
       createGID();
     }
@@ -262,23 +280,37 @@
   function getGID() {
     ajax({
       url: 'https://linkcrm.verge-tech.cn/?c=record&m=get_gid',
-      jsonp: 'jsonpcallback',
+      dataType: 'jsonp',
+      jsonp: "jsonpcallback",
       success: function (res) {
-        var res = JSON.parse(res);
         if (res.code == 200) {
-          var GID = res.info.GID;
+          var GID = res.GID;
           localStorage.setItem('_MD_GID', GID);
           setCookie('GID', GID, 30, 1);
         }
         setGID();
       },
-      error: function () {
-        console.log('error')
+      error: function (error) {
+        console.log(error)
       }
     })
   }
-  // getGID();
-  setGID();
+  getGID();
+
+  // 保存GID到服务器
+  function saveGID(GID) {
+    ajax({
+      url: 'https://linkcrm.verge-tech.cn/?c=record&m=save_gid',
+      jsonp: 'jsonpcallback',
+      data: { 'GID': GID },
+      success: function (res) {
+
+      },
+      error: function (error) {
+        console.log(error)
+      }
+    })
+  }
 
   // 获取用户来源URL
   function getReferrer() {
@@ -312,15 +344,16 @@
   getIP();
 
   // 获取用户点击的第一个超链接或者按钮的文本信息；如果点击的是超链接可以同时获取nextUrl
-  function getFirstClickItem() {
+  function mouseDownCallback() {
     document.addEventListener('mousedown', function (e) {
-      var firstClickItem = localStorage.getItem('_MD_firstClickItem');
-      if (firstClickItem != null && firstClickItem != '') {
-        return false;
-      }
+      e = e || window.event;
       var _target = e.target;
-      // 获取第一个点击行为的文本信息
-      if (_target.localName == 'a' || _target.localName == 'button') {
+      // 获取第一个点击行为(按钮或超链接)的文本信息
+      if (_target.localName.toLowerCase() == 'a' || _target.localName.toLowerCase() == 'button') {
+        var firstClickItem = localStorage.getItem('_MD_firstClickItem');
+        if (firstClickItem != null && firstClickItem != '') {
+          return false;
+        }
         firstClickItem = _target.innerHTML;
         localStorage.setItem('_MD_firstClickItem', firstClickItem);
         // 获取即将跳转的url
@@ -328,30 +361,27 @@
           localStorage.setItem('_MD_nextUrl', _target.href);
         }
       }
+      // 获取输入框的值
+      if (_target.localName.toLowerCase() == 'input' || _target.localName.toLowerCase() == 'textarea') {
+        var id = _target.id;
+        document.getElementById(id).addEventListener('blur', function (event) {
+          var inputContent = event.target.value;
+          var _inputContent = localStorage.getItem('_MD_inputContent');
+          var _inputContent_arr = [];
+          if (_inputContent != null && _inputContent != '') {
+            _inputContent_arr = _inputContent.split(',');
+          }
+          if (inputContent != '') {
+            _inputContent_arr.push(inputContent);
+          }
+          _inputContent_arr = unique(_inputContent_arr); // 去重
+          localStorage.setItem('_MD_inputContent', _inputContent_arr.toString());
+        })
+      }
     });
   }
   // 调用记录第一个点击行为方法
-  getFirstClickItem();
-
-  // 获取搜索框关键词,id为需要监测的搜索框id
-  function getKeyWords(id) {
-    if (document.getElementById(id) != null) {
-      document.getElementById(id).addEventListener('blur', function () {
-        var input_value = this.value;
-        var inputContent = localStorage.getItem('_MD_inputContent');
-        var inputContentArr = [];
-        if (inputContent != null && inputContent != '') {
-          inputContentArr = inputContent.split(',');
-        }
-        if (input_value != '') {
-          inputContentArr.push(input_value);
-        }
-        localStorage.setItem('_MD_inputContent', inputContentArr.toString());
-      })
-    }
-  }
-  // 调用记录关键字方法，这里的keyword是只相关的搜索框id，使用时请更换
-  getKeyWords('keyword');
+  mouseDownCallback();
 
   // 发送POST请求，把数据发送给后台
   function sendData(data) {
